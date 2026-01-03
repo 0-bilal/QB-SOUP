@@ -134,14 +134,14 @@ header p {
 .price-tag {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     border: none; 
-    padding: 8px 10px; 
+    padding: 7px 15px; 
     border-radius: 10px; 
     font-weight: bold; 
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 3px 10px rgba(230, 126, 34, 0.3);
-    font-size: 0.70rem;
+    font-size: 0.85rem;
 }
 
 .controls { 
@@ -167,9 +167,9 @@ header p {
     font-weight: bold; 
     font-size: 1rem; 
     cursor: pointer;
-    width: 26px;
-    height: 26px;
-    border-radius: 7px;
+    width: 27px;
+    height: 30px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -191,7 +191,7 @@ header p {
 .add-btn { 
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     border: none; 
-    padding: 8px 15px; 
+    padding: 7px 15px; 
     border-radius: 10px; 
     font-weight: bold; 
     color: white;
