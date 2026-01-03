@@ -240,7 +240,7 @@ async function processOrder() {
         document.getElementById('feedback-view').style.display = 'block';
         document.getElementById('feedback-view').className = "feedback-view success";
         document.getElementById('status-title').innerText = "تم تقديم الطلب بنجاح! ✅";
-        document.getElementById('status-msg').innerText = `شكراً لك ${name}، طلبك قيد التحضير وسيصلك قريباً 🍲`;
+        document.getElementById('status-msg').innerText = `شكراً لك ${name}، طلبك قيد التحضير  🍲`;
         
         cart = {};
         updateCartCount();
