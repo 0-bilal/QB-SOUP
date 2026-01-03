@@ -5,6 +5,7 @@ const menuData = [
     { id: 4, name: "الشوربة الرمضانية", price: 20, desc: "شوربة شوفان كويكر الرمضانية باللحم البلدي الطازج والبهارات السعودية", img: "img/4.png" },
     { id: 5, name: "شوربة البيتزا", price: 20, desc: "شوربة الطماطم المشوية مع الريحان والفلفل الرومي والبصل وزيت زيتون بكر", img: "img/1.png" },
     { id: 6, name: "شوربة اللازانيا", price: 25, desc: "شوربة اللازانيا الإيطالية بطعمها الأصيل، مزيج شهي من اللحم المفروم وجبنة الموزاريلا", img: "img/1.png" }
+ 
 ];
 
 let cart = {};
@@ -19,14 +20,16 @@ menuData.forEach(soup => {
         <div class="soup-info">
             <h3>${soup.name}</h3>
             <p>${soup.desc}</p>
-            <div class="price-tag">${soup.price} ر.س</div>
+           
             <div class="controls">
                 <div class="qty-selector">
                     <button onclick="changeQty(${soup.id}, -1)">-</button>
-                    <span id="qty-val-${soup.id}">1</span>
+                    <span id="qty-val-${soup.id}">0</span>
                     <button onclick="changeQty(${soup.id}, 1)">+</button>
                 </div>
-                <button class="add-btn" onclick="addToCart(${soup.id})">أضف للسلة</button>
+                
+                <button class="add-btn" onclick="addToCart(${soup.id})">أطلب</button>
+                <div class="price-tag">${soup.price} </div>
             </div>
         </div>
     `;
@@ -195,35 +198,59 @@ function closeModal() {
     document.getElementById('modal-overlay').classList.remove('active');
 }
 
-function processOrder() {
+async function processOrder() {
     const name = document.getElementById('cust-name').value.trim();
     const phone = document.getElementById('cust-phone').value.trim();
- 
-
-    if (!name || !phone ) {
+    
+    if (!name || !phone) {
         alert("الرجاء إدخال جميع البيانات المطلوبة");
         return;
     }
 
-    // Simulate success
-    const isSuccess = true;
+    // تجهيز نص الطلب من السلة
+    const orderItems = Object.values(cart).map(item => `${item.name} (${item.qty})`).join('\n');
+    const totalAmount = document.getElementById('total-amount').innerText;
 
-    document.getElementById('checkout-view').style.display = 'none';
-    document.getElementById('feedback-view').style.display = 'block';
-    document.getElementById('feedback-view').className = isSuccess ? "feedback-view success" : "feedback-view error";
+    const orderData = {
+        name: name,
+        phone: phone,
+        order: orderItems,
+        total: totalAmount
+    };
 
-    document.getElementById('status-title').innerText = isSuccess ? "تم تقديم الطلب بنجاح! ✅" : "فشل الطلب";
-    document.getElementById('status-msg').innerText = isSuccess 
-        ? `شكراً لك ${name}، طلبك قيد التحضير وسيصلك قريباً 🍲`
-        : "حدث خطأ في معالجة طلبك، الرجاء المحاولة مرة أخرى";
-    
-    if (isSuccess) {
-        // Clear cart after successful order
+    // إظهار حالة جاري الإرسال
+    const btn = document.querySelector('#checkout-view .primary-btn');
+    btn.innerText = "جاري إرسال الطلب...";
+    btn.disabled = true;
+
+    try {
+        // استبدل الرابط أدناه برابط Google Web App الخاص بك
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyCwHU2arCTRmUVuTdodDvmJrvr0Vf8zlpztGnpu8EEa_8T7T7QcqXxV6KH9bU5EwZg2w/exec';
+        
+        await fetch(scriptURL, {
+            method: 'POST',
+            mode: 'no-cors', // لتجنب مشاكل الـ CORS
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        });
+
+        // إذا نجح الإرسال (أو تم بنجاح في حالة no-cors)
+        document.getElementById('checkout-view').style.display = 'none';
+        document.getElementById('feedback-view').style.display = 'block';
+        document.getElementById('feedback-view').className = "feedback-view success";
+        document.getElementById('status-title').innerText = "تم تقديم الطلب بنجاح! ✅";
+        document.getElementById('status-msg').innerText = `شكراً لك ${name}، طلبك قيد التحضير وسيصلك قريباً 🍲`;
+        
         cart = {};
         updateCartCount();
-        // Clear form
         document.getElementById('cust-name').value = '';
         document.getElementById('cust-phone').value = '';
 
+    } catch (error) {
+        console.error('Error!', error.message);
+        alert("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.");
+        btn.innerText = "تأكيد وإرسال الطلب";
+        btn.disabled = false;
     }
 }
