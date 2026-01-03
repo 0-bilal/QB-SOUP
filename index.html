@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>شــوربـــة</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="mobile-wrapper">
+        <header>
+            <div class="logo">شــور<span>بـــة</span></div>
+            <p>حياك الله في أول محل مختص بالشوربة, شوربات محلية وعالمية والمنيو دايماً في تطور</p>
+        </header>
+
+        <main id="menu-container">
+        </main>
+
+        <div id="cart-fab" class="cart-fab" onclick="openCart()">
+            <span class="cart-icon">🛒</span>
+            <span id="cart-count" class="cart-count">0</span>
+        </div>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal-sheet">
+            <div class="drag-handle"></div>
+
+            <div id="cart-view">
+                <h2>🛒 سلة التسوق</h2>
+                <div id="cart-items" class="cart-items">
+                    <div class="empty-cart">
+                        <div class="empty-icon">🍲</div>
+                        <p>سلتك فارغة</p>
+                        <p class="empty-subtitle">أضف بعض الشوربات اللذيذة!</p>
+                    </div>
+                </div>
+
+                <div id="cart-summary" class="cart-summary" style="display: none;">
+                    <div class="summary-line"><span>المجموع الفرعي</span> <span id="subtotal-amount">0.00 ر.س</span></div>
+                    <div class="summary-line"><span>ضريبة القيمة المضافة (15%)</span> <span id="vat-amount">0.00 ر.س</span></div>
+                    <div class="summary-line total"><span>الإجمالي</span> <span id="total-amount">0.00 ر.س</span></div>
+                </div>
+
+                <div id="cart-actions" style="display: none;">
+                    <button class="primary-btn" onclick="proceedToCheckout()">إتمام الطلب</button>
+                </div>
+                <button class="text-btn" onclick="closeModal()">مواصلة التسوق</button>
+            </div>
+
+            <div id="checkout-view" style="display: none;">
+                <button class="back-btn" onclick="backToCart()">← العودة للسلة</button>
+                <h2>تفاصيل التوصيل</h2>
+                
+                <div id="checkout-summary" class="checkout-summary"></div>
+
+                <div class="input-group">
+                    <label>معلومات التواصل</label>
+                    <input type="text" id="cust-name" placeholder="الاسم الكامل">
+                    <input type="tel" id="cust-phone" placeholder="رقم الجوال">
+                    
+                </div>
+
+                <button class="primary-btn" onclick="processOrder()">تأكيد وإرسال الطلب</button>
+                <button class="text-btn" onclick="backToCart()">إلغاء</button>
+            </div>
+
+            <div id="feedback-view" class="feedback-view">
+                <div id="status-icon" class="status-icon"></div>
+                <h2 id="status-title"></h2>
+                <p id="status-msg"></p>
+                <button class="primary-btn" onclick="closeModal()">العودة إلى القائمة</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
