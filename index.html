@@ -147,7 +147,7 @@
                 <span class="contact-value" data-translate="HungerStation">هنقرستيشن</span>
             </div>
             </a>
-            </div>
+            
             </div>
 
                 <button class="primary-btn" onclick="closeModal()" data-translate="close">إغلاق</button>
@@ -210,16 +210,45 @@
             <div class="dev-details">
                 <span class="dev-date">2026 Jan</span>
                 <span class="dev-separator">•</span>
-                <span class="dev-base">v3.1 || QB</span>
+                <span class="dev-base">v3.2 || QB</span>
             </div>
         </div>
         
     </div>
+
+
+    
 </footer>
 
     <script src="./js/products.js"></script>
     <script src="./js/translations.js"></script>
     <script src="./js/script.js"></script>
+
+<script>
+    function autoRefreshSite() {
+        // نتحقق من العناصر الموجودة في الصفحة
+        const cartView = document.getElementById('cart-view');
+        const checkoutView = document.getElementById('checkout-view');
+        const modalOverlay = document.getElementById('modal-overlay');
+
+        const isUserBusy = modalOverlay && modalOverlay.classList.contains('active');
+
+        if (!isUserBusy) {
+        
+            console.log("سيتم إعادة التحميل الآن...");
+            
+            const cleanUrl = window.location.origin + window.location.pathname;
+            const refreshUrl = cleanUrl + '?v=' + new Date().getTime();
+            
+            window.location.href = refreshUrl;
+        } else {
+            console.log("المستخدم مشغول (المودال مفتوح)، تم تأجيل التحديث.");
+        }
+    }
+
+
+      setInterval(autoRefreshSite, 10 * 60 * 1000);
+</script>
 
 </body>
 </html>
