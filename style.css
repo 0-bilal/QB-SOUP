@@ -682,3 +682,65 @@ header p {
 .custom-toast.show {
     transform: translateX(-50%) translateY(0);
 }
+
+/* --- تصميم الفوتر المطور --- */
+.modern-footer {
+    background: rgba(26, 26, 26, 0.95); /* لون داكن متناسق مع الخلفية */
+    border-top: 1px solid rgba(230, 126, 34, 0.3); /* خط علوي نحيف برتقالي */
+    padding: 30px 20px;
+    margin-top: 50px;
+    backdrop-filter: blur(10px); /* تأثير زجاجي */
+}
+
+.footer-content {
+    max-width: 480px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.developer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dev-main {
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: var(--primary); /* اللون البرتقالي الأساسي */
+    letter-spacing: 0.5px;
+}
+
+.dev-details {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.7rem;
+    color: #888; /* لون رمادي للنصوص الجانبية */
+}
+
+.dev-separator {
+    color: var(--primary);
+    opacity: 0.5;
+}
+
+.dev-base {
+    background: rgba(230, 126, 34, 0.1);
+    padding: 2px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(230, 126, 34, 0.2);
+    color: #ccc;
+}
+
+/* إضافة لمسة جمالية: خط متدرج تحت اسم المطور */
+.dev-name::after {
+    content: '';
+    display: block;
+    width: 100px;
+    height: 1px;
+    background: var(--primary);
+    margin: 8px auto 0;
+    border-radius: 2px;
+    opacity: 0.6;
+}
