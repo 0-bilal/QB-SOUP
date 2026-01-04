@@ -2,7 +2,7 @@
 const translations = {
     ar: {
         // Header
-        'header-desc': 'حياك الله في أول محل مختص بالشوربة, شوربات محلية وعالمية والمنيو دايماً في تطور',
+        'header-desc': 'مطاعم شوربة، نحب ونهتم بالشوربة وتفاصيلها. هنا تجد اللذة والقيمة الغذائية في زبدية شوربة',
         
         // Working Hours
         'working-hours-title': 'أوقات العمل',
@@ -21,6 +21,8 @@ const translations = {
         'email': 'البريد الإلكتروني',
         'location': 'الموقع',
         'address': 'مكة, طريق الملك فهد',
+        'Delivery': 'التوصيل',
+        'HungerStation': 'هنقرستيشن',
         
         // Cart
         'cart-title': '🛒 سلة التسوق',
@@ -68,7 +70,7 @@ const translations = {
     
     en: {
         // Header
-        'header-desc': 'Welcome to the first soup specialty store, local and international soups with an ever-evolving menu',
+        'header-desc': 'Shorba suop— we love soup and care deeply about every detail. Here, you’ll find rich flavor and wholesome nutrition in every bowl of soup.',
         
         // Working Hours
         'working-hours-title': 'Working Hours',
@@ -87,6 +89,8 @@ const translations = {
         'email': 'Email',
         'location': 'Location',
         'address': 'Makkah, King Fahd Road',
+        'Delivery': 'Delivery',
+        'HungerStation': 'HungerStation',
         
         // Cart
         'cart-title': '🛒 Shopping Cart',
