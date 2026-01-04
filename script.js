@@ -1,10 +1,10 @@
 const menuData = [
-    { id: 1, name: "شوربة الجريش", price: 15, desc: "شوربة الجريش الشعبية تميزة بالتوابل السعودية ع الدجاج", img: "img/2.png" },
-    { id: 2, name: "شوربة الدجاج بالكريمة والذرة", price: 15, desc: "شوربة الدجاج بالذرة والكريمة كما يجب أن تكون", img: "img/1.png" },
-    { id: 3, name: "شوربة الحريرة", price: 20, desc: "شوربة الحريرة باللحم البلدي الطازج والحمص والشعيرية بمزيج من البهارات المغربية", img: "img/2.png" },
-    { id: 4, name: "الشوربة الرمضانية", price: 20, desc: "شوربة شوفان كويكر الرمضانية باللحم البلدي الطازج والبهارات السعودية", img: "img/4.png" },
-    { id: 5, name: "شوربة البيتزا", price: 20, desc: "شوربة الطماطم المشوية مع الريحان والفلفل الرومي والبصل وزيت زيتون بكر", img: "img/1.png" },
-    { id: 6, name: "شوربة اللازانيا", price: 25, desc: "شوربة اللازانيا الإيطالية بطعمها الأصيل، مزيج شهي من اللحم المفروم وجبنة الموزاريلا", img: "img/1.png" }
+    { id: 1, name: "شوربة الجريش", price: 15, desc: "شوربة الجريش الشعبية تميزة بالتوابل السعودية ع الدجاج", img: "img/menu/2.png" },
+    { id: 2, name: "شوربة الدجاج بالكريمة والذرة", price: 15, desc: "شوربة الدجاج بالذرة والكريمة كما يجب أن تكون", img: "img/menu/1.png" },
+    { id: 3, name: "شوربة الحريرة", price: 20, desc: "شوربة الحريرة باللحم البلدي الطازج والحمص والشعيرية بمزيج من البهارات المغربية", img: "img/menu/2.png" },
+    { id: 4, name: "الشوربة الرمضانية", price: 20, desc: "شوربة شوفان كويكر الرمضانية باللحم البلدي الطازج والبهارات السعودية", img: "img/menu/4.png" },
+    { id: 5, name: "شوربة البيتزا", price: 20, desc: "شوربة الطماطم المشوية مع الريحان والفلفل الرومي والبصل وزيت زيتون بكر", img: "img/menu/1.png" },
+    { id: 6, name: "شوربة اللازانيا", price: 25, desc: "شوربة اللازانيا الإيطالية بطعمها الأصيل، مزيج شهي من اللحم المفروم وجبنة الموزاريلا", img: "img/menu/1.png" }
  
 ];
 
@@ -248,7 +248,7 @@ async function processOrder() {
     btn.disabled = true; //
 
     try {
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyCwHU2arCTRmUVuTdodDvmJrvr0Vf8zlpztGnpu8EEa_8T7T7QcqXxV6KH9bU5EwZg2w/exec'; //
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyrKS3yMc-huZs-FRdSs23pIwwC3FhId9WbV8xnV8MYq6FSZvezNmMEu9Iu3H7dOP2fAA/exec'; //
         
         await fetch(scriptURL, {
             method: 'POST',
