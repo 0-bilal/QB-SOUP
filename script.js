@@ -46,7 +46,7 @@ function showToast(message) {
     toast.innerText = message;
     toast.classList.add('show');
     
-    // تختفي الرسالة تلقائياً بعد 3 ثواني
+   
     setTimeout(() => {
         toast.classList.remove('show');
     }, 3000);
@@ -56,9 +56,8 @@ function addToCart(id) {
     const soup = menuData.find(s => s.id === id);
     const qty = parseInt(document.getElementById(`qty-val-${id}`).innerText);
     
-    // التحقق من الكمية قبل الإضافة
     if (qty <= 0) {
-        showToast("يرجى تحديد الكمية أولاً"); // استخدام التنبيه الجديد
+        showToast("يرجى تحديد الكمية أولاً"); 
         return;
     }
     
@@ -68,7 +67,6 @@ function addToCart(id) {
         cart[id] = { ...soup, qty };
     }
     
-    // إعادة ضبط العداد إلى 0 بعد الإضافة
     document.getElementById(`qty-val-${id}`).innerText = '1';
     
     updateCartCount();
@@ -152,10 +150,12 @@ function renderCart() {
         `;
     }).join('');
     
-    const vat = subtotal * 0.15;
-    const total = subtotal + vat;
+// الحسابات الجديدة: السعر شامل الضريبة
+    const total = subtotal; // المجموع النهائي هو نفس مجموع أسعار المنتجات المضافة
+    const amountBeforeVat = total / 1.15; // استخراج القيمة قبل الضريبة
+    const vat = total - amountBeforeVat; // استخراج قيمة الضريبة من الإجمالي
     
-    document.getElementById('subtotal-amount').innerText = `${subtotal.toFixed(2)} ر.س`;
+    document.getElementById('subtotal-amount').innerText = `${amountBeforeVat.toFixed(2)} ر.س`;
     document.getElementById('vat-amount').innerText = `${vat.toFixed(2)} ر.س`;
     document.getElementById('total-amount').innerText = `${total.toFixed(2)} ر.س`;
     
@@ -182,24 +182,25 @@ function removeFromCart(id) {
 
 function proceedToCheckout() {
     const items = Object.values(cart);
-    let subtotal = 0;
+    let total = 0;
     
     const summaryHTML = items.map(item => {
         const itemTotal = item.price * item.qty;
-        subtotal += itemTotal;
+        total += itemTotal;
         return `<div class="checkout-item">${item.name} × ${item.qty} <span>${itemTotal.toFixed(2)} ر.س</span></div>`;
     }).join('');
     
-    const vat = subtotal * 0.15;
-    const total = subtotal + vat;
+    // حساب الضريبة المستخرجة من الإجمالي
+    const amountBeforeVat = total / 1.15;
+    const vat = total - amountBeforeVat;
     
     document.getElementById('checkout-summary').innerHTML = `
         <div class="checkout-box">
             ${summaryHTML}
             <div class="checkout-divider"></div>
-            <div class="checkout-item"><strong>المجموع الفرعي</strong> <span>${subtotal.toFixed(2)} ر.س</span></div>
-            <div class="checkout-item"><strong>ضريبة القيمة المضافة</strong> <span>${vat.toFixed(2)} ر.س</span></div>
-            <div class="checkout-item total"><strong>الإجمالي</strong> <span>${total.toFixed(2)} ر.س</span></div>
+            <div class="checkout-item"><strong>المجموع (غير شامل الضريبة)</strong> <span>${amountBeforeVat.toFixed(2)} ر.س</span></div>
+            <div class="checkout-item"><strong>ضريبة القيمة المضافة (15%)</strong> <span>${vat.toFixed(2)} ر.س</span></div>
+            <div class="checkout-item total"><strong>الإجمالي (شامل الضريبة)</strong> <span>${total.toFixed(2)} ر.س</span></div>
         </div>
     `;
     
@@ -221,54 +222,57 @@ async function processOrder() {
     const phone = document.getElementById('cust-phone').value.trim();
     
     if (!name || !phone) {
-        alert("الرجاء إدخال جميع البيانات المطلوبة");
+        showToast("الرجاء إدخال جميع البيانات المطلوبة"); 
         return;
     }
 
-    // تجهيز نص الطلب من السلة
-    const orderItems = Object.values(cart).map(item => `${item.name} (${item.qty})`).join('\n');
-    const totalAmount = document.getElementById('total-amount').innerText;
+    const phoneRegex = /^05\d{8}$/;
+    if (!phoneRegex.test(phone)) {
+        showToast("يرجى التاكد من صحه رقم الهاتف");
+        return;
+    }
+
+
+    const orderItems = Object.values(cart).map(item => `${item.name} (${item.qty})`).join('\n'); //
+    const totalAmount = document.getElementById('total-amount').innerText; //
 
     const orderData = {
         name: name,
         phone: phone,
         order: orderItems,
         total: totalAmount
-    };
+    }; 
 
-    // إظهار حالة جاري الإرسال
-    const btn = document.querySelector('#checkout-view .primary-btn');
-    btn.innerText = "جاري إرسال الطلب...";
-    btn.disabled = true;
+    const btn = document.querySelector('#checkout-view .primary-btn'); //
+    btn.innerText = "جاري إرسال الطلب..."; //
+    btn.disabled = true; //
 
     try {
-        // استبدل الرابط أدناه برابط Google Web App الخاص بك
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyCwHU2arCTRmUVuTdodDvmJrvr0Vf8zlpztGnpu8EEa_8T7T7QcqXxV6KH9bU5EwZg2w/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyCwHU2arCTRmUVuTdodDvmJrvr0Vf8zlpztGnpu8EEa_8T7T7QcqXxV6KH9bU5EwZg2w/exec'; //
         
         await fetch(scriptURL, {
             method: 'POST',
-            mode: 'no-cors', // لتجنب مشاكل الـ CORS
+            mode: 'no-cors',
             cache: 'no-cache',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(orderData)
-        });
+        }); //
 
-        // إذا نجح الإرسال (أو تم بنجاح في حالة no-cors)
-        document.getElementById('checkout-view').style.display = 'none';
-        document.getElementById('feedback-view').style.display = 'block';
-        document.getElementById('feedback-view').className = "feedback-view success";
-        document.getElementById('status-title').innerText = "تم تقديم الطلب بنجاح! ✅";
-        document.getElementById('status-msg').innerText = `شكراً لك ${name}، طلبك قيد التحضير  🍲`;
+        document.getElementById('checkout-view').style.display = 'none'; 
+        document.getElementById('feedback-view').style.display = 'block'; 
+        document.getElementById('feedback-view').className = "feedback-view success"; 
+        document.getElementById('status-title').innerText = "تم تقديم الطلب بنجاح! ✅"; 
+        document.getElementById('status-msg').innerText = `شكراً لك ${name}، طلبك قيد التحضير  🍲`; 
         
-        cart = {};
-        updateCartCount();
-        document.getElementById('cust-name').value = '';
-        document.getElementById('cust-phone').value = '';
+        cart = {}; //
+        updateCartCount(); //
+        document.getElementById('cust-name').value = ''; 
+        document.getElementById('cust-phone').value = ''; 
 
     } catch (error) {
-        console.error('Error!', error.message);
-        alert("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.");
-        btn.innerText = "تأكيد وإرسال الطلب";
-        btn.disabled = false;
+        console.error('Error!', error.message); 
+        showToast("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى."); 
+        btn.innerText = "تأكيد وإرسال الطلب"; 
+        btn.disabled = false; //
     }
 }
