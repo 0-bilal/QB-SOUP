@@ -20,16 +20,14 @@ menuData.forEach(soup => {
         <div class="soup-info">
             <h3>${soup.name}</h3>
             <p>${soup.desc}</p>
-           
             <div class="controls">
                 <div class="qty-selector">
                     <button onclick="changeQty(${soup.id}, -1)">-</button>
-                    <span id="qty-val-${soup.id}">0</span>
+                    <span id="qty-val-${soup.id}">1</span>
                     <button onclick="changeQty(${soup.id}, 1)">+</button>
                 </div>
-                
                 <button class="add-btn" onclick="addToCart(${soup.id})">أطلب</button>
-                <div class="price-tag">${soup.price} </div>
+                <div class="price-tag">${soup.price}ريال </div>
             </div>
         </div>
     `;
@@ -42,9 +40,27 @@ function changeQty(id, delta) {
     if (current >= 1) el.innerText = current;
 }
 
+
+function showToast(message) {
+    const toast = document.getElementById('custom-toast');
+    toast.innerText = message;
+    toast.classList.add('show');
+    
+    // تختفي الرسالة تلقائياً بعد 3 ثواني
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
 function addToCart(id) {
     const soup = menuData.find(s => s.id === id);
     const qty = parseInt(document.getElementById(`qty-val-${id}`).innerText);
+    
+    // التحقق من الكمية قبل الإضافة
+    if (qty <= 0) {
+        showToast("يرجى تحديد الكمية أولاً"); // استخدام التنبيه الجديد
+        return;
+    }
     
     if (cart[id]) {
         cart[id].qty += qty;
@@ -52,12 +68,14 @@ function addToCart(id) {
         cart[id] = { ...soup, qty };
     }
     
-    // Reset quantity selector
+    // إعادة ضبط العداد إلى 0 بعد الإضافة
     document.getElementById(`qty-val-${id}`).innerText = '1';
     
     updateCartCount();
     showCartNotification();
 }
+
+
 
 function updateCartCount() {
     const count = Object.values(cart).reduce((sum, item) => sum + item.qty, 0);
@@ -127,7 +145,7 @@ function renderCart() {
                         <span>${item.qty}</span>
                         <button onclick="updateCartQty(${item.id}, 1)">+</button>
                     </div>
-                    <button class="remove-btn" onclick="removeFromCart(${item.id})">🗑️</button>
+                    <button class="remove-btn" onclick="removeFromCart(${item.id})">حذف</button>
                 </div>
                 <div class="cart-item-total">${itemTotal.toFixed(2)} ر.س</div>
             </div>

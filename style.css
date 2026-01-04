@@ -2,7 +2,7 @@
     --primary: #e67e22;
     --primary-dark: #d35400;
     --success: #27ae60;
-    --error: #e74c3c;
+    --error: #e67e22;
     --dark: #1a1a1a;
     --light: #fefefe;
     --gray: #f4f4f4;
@@ -132,7 +132,7 @@ header p {
 }
 
 .price-tag {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark)100%);
     border: none; 
     padding: 7px 15px; 
     border-radius: 10px; 
@@ -153,7 +153,7 @@ header p {
 .qty-selector { 
     background: #333; 
     border-radius: 100px; 
-    padding: 4px 1px; 
+    padding: 0.5px 1px; 
     display: flex; 
     align-items: center; 
     gap: 10px;
@@ -197,7 +197,7 @@ header p {
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 3px 10px rgba(230, 126, 34, 0.3);
+    box-shadow: 0 2px 10px rgba(230, 126, 34, 0.3);
     font-size: 0.85rem;
 }
 
@@ -205,34 +205,37 @@ header p {
 
 /* Cart FAB */
 .cart-fab {
+    gap: 10px; /* المسافة بين الأيقونة والعداد والنص */
     position: fixed;
-    bottom: 25px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    width: 65px;
-    height: 65px;
-    border-radius: 50%;
+    background: white;
+    width: 90%; /* عرض المستطيل بالنسبة للشاشة */
+    max-width: 400px; /* أقصى عرض للمستطيل */
+    height: 55px;
+    border-radius: 15px; /* حواف دائرية خفيفة للمستطيل */
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: center; /* توزيع العناصر بالتساوي */
+    padding: 0 20px;
     cursor: pointer;
-    box-shadow: 0 8px 25px rgba(230, 126, 34, 0.5);
+    box-shadow: 0 8px 25px rgb(7, 6, 4);
     transition: all 0.3s ease;
     z-index: 999;
+    gap: 15px; /
+}
+
+.cart-fab::after {
+    content: "عرض سلة الطلبات";
+    font-weight: bold;
+    font-size: 1rem;
+    color: #e67e22;
 }
 
 .cart-fab:hover {
-    transform: translateX(-50%) scale(1.1);
-    box-shadow: 0 12px 35px rgba(230, 126, 34, 0.7);
-}
-
-.cart-fab.has-items {
-    animation: wiggle 0.5s ease-in-out;
-}
-
-.cart-fab.bounce {
-    animation: bounce 0.6s ease;
+    transform: translateX(-50%) translateY(-3px);
+    box-shadow: 0 0px 25px rgba(230, 126, 34, 0.6);
 }
 
 @keyframes wiggle {
@@ -246,25 +249,34 @@ header p {
     50% { transform: translateX(-50%) scale(1.2); }
 }
 
-.cart-icon {
+.cart-icon  {
     font-size: 1.8rem;
 }
 
 .cart-count {
-    position: absolute;
-    top: 3px;
-    right: 3px;
+    /* تغيير من absolute إلى relative أو static ليكون بجانب الأيقونة */
+    position: relative; 
+    top: auto;
+    right: auto;
+    
+    /* الحفاظ على الشكل الدائري */
     background: var(--error);
     color: white;
-    width: 24px;
+    width: 24px;  /* زيادة الحجم قليلاً ليكون أوضح بجانب الأيقونة */
     height: 24px;
     border-radius: 50%;
-    display: none;
+    
+    /* التوسيط الداخلي للرقم */
+    display: none; /* سيتم تغييره إلى flex بواسطة JavaScript عند إضافة منتجات */
     align-items: center;
     justify-content: center;
-    font-size: 0.7rem;
+    
+    font-size: 0.8rem;
     font-weight: bold;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    
+    /* منع العداد من التقلص */
+    flex-shrink: 0;
 }
 
 /* Modal & Transitions */
@@ -329,10 +341,11 @@ header p {
 .empty-cart {
     text-align: center;
     padding: 40px 20px;
-    color: #999;
+    color: #000000;
 }
 
 .empty-icon {
+    
     font-size: 3.5rem;
     margin-bottom: 12px;
     opacity: 0.6;
@@ -345,7 +358,7 @@ header p {
 
 .empty-subtitle {
     font-size: 0.88rem !important;
-    color: #bbb !important;
+    color: #000000 !important;
 }
 
 .cart-item {
@@ -426,6 +439,7 @@ header p {
 }
 
 .remove-btn {
+    color: white;
     background: var(--error);
     border: none;
     padding: 6px 10px;
@@ -638,7 +652,7 @@ header p {
     width: 100%; 
     background: none; 
     border: none; 
-    color: #888; 
+    color: #e67e22; 
     padding: 10px; 
     margin-top: 8px;
     cursor: pointer;
@@ -648,4 +662,23 @@ header p {
 
 .text-btn:hover {
     color: var(--primary);
+}
+
+.custom-toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background-color: #e74c3c; /* لون أحمر للتنبيه */
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 14px;
+    z-index: 9999;
+    transition: transform 0.3s ease-in-out;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.custom-toast.show {
+    transform: translateX(-50%) translateY(0);
 }
