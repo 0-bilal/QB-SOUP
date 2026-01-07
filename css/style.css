@@ -2,7 +2,7 @@
     --primary: #e67e22;
     --primary-dark: #d35400;
     --success: #27ae60;
-    --error: #e67e22;
+    --error: #e74c3c;
     --dark: #1a1a1a;
     --light: #fefefe;
     --gray: #f4f4f4;
@@ -22,7 +22,7 @@ body {
     min-height: 100vh;
     min-height: 100dvh; 
     background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-    background-attachment: fixed; /* يثبت الخلفية لكي لا تنتهي عند التمرير */
+    background-attachment: fixed;
     color: var(--light);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     direction: rtl;
@@ -35,21 +35,29 @@ body {
     padding: 20px;
 }
 
+/* Header Styles */
 header { 
     text-align: center; 
-    margin-bottom: 25px;
+    margin-bottom: 15px;
     padding: 15px 0;
 }
 
-
-.logo img {
-    height: 50px; /* تصغير الارتفاع قليلاً ليناسب الصف */
-    width: auto;
+.main-header {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-between; 
+    padding: 10px 0;
+    margin-bottom: 10px;
 }
 
-
 .logo {
-    margin-bottom: 0; /* إلغاء الهامش السفلي */
+    margin-bottom: 0;
+}
+
+.logo img {
+    height: 50px;
+    width: auto;
 }
 
 .logo span { 
@@ -63,12 +71,66 @@ header {
     50% { transform: scale(1.05); }
 }
 
-header p {
+.header-desc {
+    text-align: center;
     color: #ccc;
     font-size: 0.88rem;
     line-height: 1.4;
-    margin: 0;
+    margin: 10px 0 20px 0;
     padding: 0 10px;
+    width: 100%;
+    clear: both;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin: 0;
+}
+
+.circle-btn {
+    width: 45px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(230, 126, 34, 0.3);
+    border-radius: 50%;
+    color: white;
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.circle-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(230, 126, 34, 0.4);
+}
+
+.circle-btn:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+.btn-icon {
+    display: block;
+    width: 22px;
+    height: 22px;
+}
+
+.icon-clock,
+.icon-globe,
+.icon-phone {
+    width: 22px;
+    height: 22px;
+    stroke: white;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 /* Menu Items */
@@ -138,12 +200,12 @@ header p {
 .soup-info p { 
     font-size: 0.8rem; 
     color: #bbb; 
-    margin: 0 8px 8px 0px;
+    margin: 0 8px 8px 0;
     line-height: 1.3;
 }
 
 .price-tag {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark)100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     border: none; 
     padding: 7px 15px; 
     border-radius: 10px; 
@@ -164,7 +226,7 @@ header p {
 .qty-selector { 
     background: #333; 
     border-radius: 100px; 
-    padding: 0.5px 1px; 
+    padding: 2px 4px; 
     display: flex; 
     align-items: center; 
     gap: 10px;
@@ -212,29 +274,26 @@ header p {
     font-size: 0.85rem;
 }
 
-
-
 /* Cart FAB */
 .cart-fab {
-    gap: 10px; /* المسافة بين الأيقونة والعداد والنص */
     position: fixed;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     background: white;
-    width: 90%; /* عرض المستطيل بالنسبة للشاشة */
-    max-width: 400px; /* أقصى عرض للمستطيل */
+    width: 90%;
+    max-width: 400px;
     height: 55px;
-    border-radius: 15px; /* حواف دائرية خفيفة للمستطيل */
+    border-radius: 15px;
     display: flex;
     align-items: center;
-    justify-content: center; /* توزيع العناصر بالتساوي */
+    justify-content: center;
     padding: 0 20px;
     cursor: pointer;
-    box-shadow: 0 8px 25px rgb(7, 6, 4);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
     z-index: 999;
-    gap: 15px; /
+    gap: 15px;
 }
 
 .cart-fab::after {
@@ -246,48 +305,42 @@ header p {
 
 .cart-fab:hover {
     transform: translateX(-50%) translateY(-3px);
-    box-shadow: 0 0px 25px rgba(230, 126, 34, 0.6);
+    box-shadow: 0 10px 30px rgba(230, 126, 34, 0.5);
+}
+
+.cart-fab.has-items {
+    animation: wiggle 0.5s ease;
 }
 
 @keyframes wiggle {
     0%, 100% { transform: translateX(-50%) rotate(0deg); }
-    25% { transform: translateX(-50%) rotate(-10deg); }
-    75% { transform: translateX(-50%) rotate(10deg); }
+    25% { transform: translateX(-50%) rotate(-5deg); }
+    75% { transform: translateX(-50%) rotate(5deg); }
 }
 
-@keyframes bounce {
-    0%, 100% { transform: translateX(-50%) scale(1); }
-    50% { transform: translateX(-50%) scale(1.2); }
-}
-
-.cart-icon  {
+.cart-icon {
     font-size: 1.8rem;
+    color: var(--primary);
 }
 
 .cart-count {
-    /* تغيير من absolute إلى relative أو static ليكون بجانب الأيقونة */
-    position: relative; 
-    top: auto;
-    right: auto;
-    
-    /* الحفاظ على الشكل الدائري */
+    position: relative;
     background: var(--error);
     color: white;
-    width: 24px;  /* زيادة الحجم قليلاً ليكون أوضح بجانب الأيقونة */
-    height: 24px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
-    
-    /* التوسيط الداخلي للرقم */
-    display: none; /* سيتم تغييره إلى flex بواسطة JavaScript عند إضافة منتجات */
+    display: none;
     align-items: center;
     justify-content: center;
-    
     font-size: 0.8rem;
     font-weight: bold;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    
-    /* منع العداد من التقلص */
     flex-shrink: 0;
+}
+
+.cart-count.active {
+    display: flex;
 }
 
 /* Modal & Transitions */
@@ -352,24 +405,24 @@ header p {
 .empty-cart {
     text-align: center;
     padding: 40px 20px;
-    color: #000000;
+    color: #666;
 }
 
 .empty-icon {
-    
     font-size: 3.5rem;
     margin-bottom: 12px;
-    opacity: 0.6;
+    opacity: 0.5;
 }
 
 .empty-cart p {
     margin: 8px 0;
     font-size: 1.05rem;
+    color: #333;
 }
 
 .empty-subtitle {
     font-size: 0.88rem !important;
-    color: #000000 !important;
+    color: #666 !important;
 }
 
 .cart-item {
@@ -441,6 +494,12 @@ header p {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.cart-qty-selector button:hover {
+    background: var(--primary-dark);
+    transform: scale(1.1);
 }
 
 .cart-qty-selector span {
@@ -663,7 +722,7 @@ header p {
     width: 100%; 
     background: none; 
     border: none; 
-    color: #e67e22; 
+    color: var(--primary); 
     padding: 10px; 
     margin-top: 8px;
     cursor: pointer;
@@ -672,15 +731,16 @@ header p {
 }
 
 .text-btn:hover {
-    color: var(--primary);
+    color: var(--primary-dark);
 }
 
+/* Toast Notification */
 .custom-toast {
     position: fixed;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%) translateY(100px);
-    background-color: #e74c3c; /* لون أحمر للتنبيه */
+    background-color: var(--error);
     color: white;
     padding: 12px 24px;
     border-radius: 50px;
@@ -694,138 +754,47 @@ header p {
     transform: translateX(-50%) translateY(0);
 }
 
-/* --- تصميم الفوتر المطور --- */
-.modern-footer {
-    background: rgba(26, 26, 26, 0.95); /* لون داكن متناسق مع الخلفية */
-    border-top: 1px solid rgba(230, 126, 34, 0.3); /* خط علوي نحيف برتقالي */
-    padding: 30px 20px;
-    margin-top: 50px;
-    backdrop-filter: blur(10px); /* تأثير زجاجي */
+/* Working Hours Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
 }
 
-.footer-content {
-    max-width: 480px;
-    margin: 0 auto;
-    text-align: center;
-}
-
-.developer-info {
+.modal.active {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    animation: fadeIn 0.3s ease;
 }
 
-.dev-main {
-    font-size: 0.7rem;
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 90%;
+    width: 350px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+    font-size: 1.3rem;
     font-weight: bold;
-    color: var(--primary); /* اللون البرتقالي الأساسي */
-    letter-spacing: 0.5px;
-}
-
-.dev-details {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.7rem;
-    color: #888; /* لون رمادي للنصوص الجانبية */
-}
-
-.dev-separator {
+    margin-bottom: 20px;
     color: var(--primary);
-    opacity: 0.5;
 }
 
-.dev-base {
-    background: rgba(230, 126, 34, 0.1);
-    padding: 2px 10px;
-    border-radius: 20px;
-    border: 1px solid rgba(230, 126, 34, 0.2);
-    color: #ccc;
+.modal-body {
+    line-height: 1.8;
+    color: #333;
 }
 
-/* إضافة لمسة جمالية: خط متدرج تحت اسم المطور */
-.dev-name::after {
-    content: '';
-    display: block;
-    width: 100px;
-    height: 1px;
-    background: var(--primary);
-    margin: 8px auto 0;
-    border-radius: 2px;
-    opacity: 0.6;
-}
-
-/* ======================================
-   أكواد CSS الإضافية - يتم إضافتها على الكود الأساسي
-   ====================================== */
-
-/* --- Action Buttons (الأزرار الدائرية في الأعلى) --- */
-.action-buttons {
-    display: flex;
-    gap: 8px; /* مسافة بسيطة بين الأزرار */
-    margin: 0 !important;
-}
-
-.circle-btn {
-    width: 35px !important; 
-    height: 35px !important;
-    background: rgba(255, 255, 255, 0.1); /* شفافية لإعطاء مظهر عصري */
-    border: 1px solid rgba(230, 126, 34, 0.3);
-
-    border-radius: 50%;
-
-  
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    transition: all 0.3s ease;
-}
-
-.circle-btn:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 6px 20px rgba(230, 126, 34, 0.6);
-}
-
-.circle-btn:active {
-    transform: translateY(-1px) scale(0.98);
-}
-
-.btn-icon, .circle-btn svg {
-    width: 20px;
-    height: 20px;
-}
-
-
-.header-desc {
-    text-align: center;
-    color: #ccc;
-    font-size: 0.88rem;
-    line-height: 1.4;
-    margin: 0 0 25px 0;
-    padding: 0 10px;
-    width: 100%;
-    margin-top: 10px;
-    clear: both;
-
-
-}
-
-.btn-icon {
-    display: block;
-    animation: iconFloat 2s ease-in-out infinite;
-}
-
-@keyframes iconFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-3px); }
-}
-
-/* --- Working Hours View (نافذة أوقات العمل) --- */
 .hours-container {
     background: var(--gray);
     padding: 20px;
@@ -857,7 +826,26 @@ header p {
     direction: ltr;
 }
 
-/* --- Contact View (نافذة التواصل) --- */
+.close-btn {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+/* Contact View */
 .contact-container {
     margin: 20px 0;
 }
@@ -912,143 +900,113 @@ header p {
     font-weight: 500;
 }
 
+/* Footer */
+.modern-footer {
+    background: rgba(26, 26, 26, 0.95);
+    border-top: 1px solid rgba(230, 126, 34, 0.3);
+    padding: 30px 20px;
+    margin-top: 50px;
+    backdrop-filter: blur(10px);
+}
 
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            padding: 10px 0;
-        }
+.footer-content {
+    max-width: 480px;
+    margin: 0 auto;
+    text-align: center;
+}
 
-        .circle-btn {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .circle-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        .circle-btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-icon {
-            color: white;
-            font-size: 24px;
-        }
-
-        /* أيقونات SVG */
-        .icon-clock {
-            width: 24px;
-            height: 24px;
-            stroke: white;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .icon-globe {
-            width: 24px;
-            height: 24px;
-            stroke: white;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .icon-phone {
-            width: 24px;
-            height: 24px;
-            stroke: white;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        /* نافذة منبثقة لأوقات العمل */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 90%;
-            width: 350px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        }
-
-        .modal-header {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #667eea;
-        }
-
-        .modal-body {
-            line-height: 1.8;
-            color: #333;
-        }
-
-        .close-btn {
-            margin-top: 20px;
-            width: 100%;
-            padding: 12px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .close-btn:hover {
-            background: #5568d3;
-        }
-
-        /* مؤشر اللغة */
-        .lang-indicator {
-            text-align: center;
-            padding: 10px;
-            background: #f8f9fa;
-            margin-top: 20px;
-            border-radius: 8px;
-        }
-
-.main-header {
+.developer-info {
     display: flex;
-    flex-direction: row-reverse; /* يجعل اللوجو يمين والأزرار يسار */
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dev-main {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: var(--primary);
+    letter-spacing: 0.5px;
+}
+
+.dev-details {
+    display: flex;
+    justify-content: center;
     align-items: center;
-    justify-content: space-between; 
-    padding: 10px 0;
-    margin-bottom: 5px; /* تقليل المسافة لأن الوصف بالأسفل */
+    gap: 10px;
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.dev-separator {
+    color: var(--primary);
+    opacity: 0.5;
+}
+
+.dev-base {
+    background: rgba(230, 126, 34, 0.1);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(230, 126, 34, 0.2);
+    color: #ccc;
+}
+
+.dev-name::after {
+    content: '';
+    display: block;
+    width: 100px;
+    height: 1px;
+    background: var(--primary);
+    margin: 8px auto 0;
+    border-radius: 2px;
+    opacity: 0.6;
+}
+
+
+/* تصميم تنبيه المسافة */
+.distance-warning {
+    text-align: center;
+    padding: 10px 5px;
+}
+
+.warning-icon {
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.distance-warning h2 {
+    color: var(--error);
+    margin-bottom: 10px;
+}
+
+.distance-warning p {
+    color: #555;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.delivery-option-box {
+    background: var(--gray);
+    padding: 20px;
+    border-radius: 20px;
+    margin: 20px 0;
+    border: 1px dashed var(--primary);
+}
+
+.delivery-option-box p {
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 15px;
+}
+
+.delivery-btn {
+    display: inline-block;
+    text-decoration: none;
+    background: linear-gradient(135deg, #ffcc00 0%, #e67e22 100%); /* ألوان هنقرستيشن/شوربة */
+    color: white !important;
 }
