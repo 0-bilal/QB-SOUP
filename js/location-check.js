@@ -1,13 +1,15 @@
-// إحداثيات مطعم شوربة (مكة - طريق الملك فهد)
-const RESTAURANT_LAT = 21.389194; 
-const RESTAURANT_LNG = 39.778889;
-const MAX_ALLOWED_DISTANCE = 10; // المسافة المسموحة للطلب المباشر (15 كم)
+// إحداثيات الكعكية - مكة المكرمة
+const RESTAURANT_LAT = 21.389659317435278; 
+const RESTAURANT_LNG = 39.77928169205786;
+const MAX_ALLOWED_DISTANCE = 1; 
+let isUserTooFar = false; // متغير عالمي للتحقق من الحالة
 
 
-
-function checkUserDistance() {
+// استبدال getCurrentPosition بـ watchPosition للمراقبة المستمرة
+function startLocationWatch() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
+        // watchPosition تراقب حركة العميل وتحدث الحالة تلقائياً
+        navigator.geolocation.watchPosition(
             (position) => {
                 const distance = calculateHaversineDistance(
                     position.coords.latitude,
@@ -17,18 +19,44 @@ function checkUserDistance() {
                 );
 
                 if (distance > MAX_ALLOWED_DISTANCE) {
-                    showLocationWarning(distance.toFixed(1));
+                    isUserTooFar = true;
+                    // نظهر التنبيه فقط إذا لم يكن ظاهراً مسبقاً
+                    if (!document.getElementById('distance-warning-view')) {
+                        showLocationWarning(distance.toFixed(1));
+                    }
+                } else {
+                    // إذا أصبح العميل قريباً، نقوم بتفعيل الأزرار فوراً
+                    isUserTooFar = false;
+                    const warning = document.getElementById('distance-warning-view');
+                    if (warning) {
+                        warning.remove(); // إزالة رسالة التحذير تلقائياً
+                        closeModal(); // إغلاق النافذة المنبثقة
+                    }
+                }
+                
+                // تحديث السلة فوراً إذا كانت مفتوحة ليعرف العميل أن الزر تفعّل
+                if (typeof renderCart === 'function') {
+                    const cartView = document.getElementById('cart-view');
+                    if (cartView && cartView.style.display !== 'none') {
+                        renderCart();
+                    }
                 }
             },
-            (error) => {
-                console.warn("Location access denied or error:", error);
+            (error) => { console.warn("Location error:", error); },
+            {
+                enableHighAccuracy: true, // طلب دقة عالية
+                timeout: 5000,
+                maximumAge: 0
             }
         );
     }
 }
 
+// تغيير الاستدعاء عند تحميل الصفحة
+window.addEventListener('load', startLocationWatch);
+
 function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // نصف قطر الأرض بالكيلومترات
+    const R = 6371; 
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -42,31 +70,23 @@ function showLocationWarning(dist) {
     const modalOverlay = document.getElementById('modal-overlay');
     const modalSheet = document.querySelector('.modal-sheet');
     
-    // إخفاء المحتويات الحالية داخل المودال (سلة، ساعات العمل، إلخ)
     const views = modalSheet.querySelectorAll('div[id$="-view"], #cart-view');
     views.forEach(v => v.style.display = 'none');
 
     const warningContent = `
         <div id="distance-warning-view" class="distance-warning">
             <div class="warning-icon">📍</div>
-            <h2 data-translate="distance-title">أنت بعيد عن موقعنا</h2>
-            <p>
-                نعتذر منك، أنت تبعد عن المطعم مسافة <b>${dist} كم</b>. 
-                الطلب المباشر متاح فقط للمناطق المحيطة بالمطعم لضمان جودة الطعام.
-            </p>
-            
+            <h2 style="color: #e74c3c;">أنت خارج نطاق الطلب المباشر</h2>
+            <p>أنت تبعد عن مطعمنا مسافة <b>${dist} كم</b>. يمكنك تصفح المنيو، ولكن للطلب يرجى استخدام تطبيقات التوصيل.</p>
             <div class="delivery-option-box">
-                <p>لكن لا تقلق! يمكنك الطلب عبر تطبيقات التوصيل:</p>
-                <a href="https://hungerstation.com/sa-ar/restaurant/saudi/mecca/kudy/127096" target="_blank" class="primary-btn delivery-btn">
-                    اطلب عبر هنقرستيشن
+                <a href="https://hungerstation.com/sa-ar/restaurant/saudi/mecca/kudy/127096" target="_blank" class="primary-btn delivery-btn" style="text-decoration: none; display: block;">
+                    اطلب الآن عبر هنقرستيشن
                 </a>
             </div>
-
-            <button class="text-btn" onclick="closeModal()">تصفح القائمة فقط</button>
+            <button class="text-btn" onclick="closeModal()">تصفح المنيو فقط</button>
         </div>
     `;
 
-    // إدخال المحتوى في المودال وتفعيله
     let existingWarning = document.getElementById('distance-warning-view');
     if (existingWarning) existingWarning.remove();
     
@@ -74,5 +94,4 @@ function showLocationWarning(dist) {
     modalOverlay.classList.add('active');
 }
 
-// تشغيل الفحص عند التحميل
 window.addEventListener('load', checkUserDistance);

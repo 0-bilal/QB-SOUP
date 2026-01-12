@@ -106,6 +106,11 @@ function renderCart() {
     
     const items = Object.values(cart);
     
+
+    cartSummary.style.display = 'block';
+    cartActions.style.display = 'block';
+
+
     if (items.length === 0) {
         const emptyText = currentLanguage === 'ar' ? 'سلتك فارغة' : 'Your cart is empty';
         const emptySubtext = currentLanguage === 'ar' ? 'أضف بعض الشوربات اللذيذة!' : 'Add some delicious soups!';
@@ -121,6 +126,19 @@ function renderCart() {
         cartActions.style.display = 'none';
         return;
     }
+
+        const checkoutBtn = cartActions.querySelector('.primary-btn');
+    if (typeof isUserTooFar !== 'undefined' && isUserTooFar) {
+        checkoutBtn.disabled = true;
+        checkoutBtn.style.background = "#95a5a6"; // لون رمادي للتعطيل
+        checkoutBtn.style.cursor = "not-allowed";
+        checkoutBtn.innerText = currentLanguage === 'ar' ? "الموقع بعيد جداً للطلب المباشر" : "Location too far for direct order";
+    } else {
+        checkoutBtn.disabled = false;
+        checkoutBtn.style.background = ""; // سيعود للون الأصلي من CSS
+        checkoutBtn.innerText = currentLanguage === 'ar' ? "إتمام الطلب" : "Proceed to Checkout";
+    }
+
     
     const currency = currentLanguage === 'ar' ? 'ر.س' : 'SAR';
     const removeText = currentLanguage === 'ar' ? 'حذف' : 'Remove';
