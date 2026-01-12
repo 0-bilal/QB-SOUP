@@ -101,86 +101,71 @@ function openCart() {
 
 function renderCart() {
     const cartItems = document.getElementById('cart-items');
+    const cartTotal = document.getElementById('cart-total');
     const cartSummary = document.getElementById('cart-summary');
     const cartActions = document.getElementById('cart-actions');
     
+    cartItems.innerHTML = '';
+    let total = 0;
     const items = Object.values(cart);
-    
-
-    cartSummary.style.display = 'block';
-    cartActions.style.display = 'block';
-
 
     if (items.length === 0) {
-        const emptyText = currentLanguage === 'ar' ? 'سلتك فارغة' : 'Your cart is empty';
-        const emptySubtext = currentLanguage === 'ar' ? 'أضف بعض الشوربات اللذيذة!' : 'Add some delicious soups!';
-        
-        cartItems.innerHTML = `
-            <div class="empty-cart">
-                <div class="empty-icon">🍲</div>
-                <p>${emptyText}</p>
-                <p class="empty-subtitle">${emptySubtext}</p>
-            </div>
-        `;
+        cartItems.innerHTML = `<p style="text-align:center; padding:20px; color:#888;">${currentLanguage === 'ar' ? 'السلة فارغة' : 'Cart is empty'}</p>`;
         cartSummary.style.display = 'none';
         cartActions.style.display = 'none';
         return;
     }
 
-        const checkoutBtn = cartActions.querySelector('.primary-btn');
-    if (typeof isUserTooFar !== 'undefined' && isUserTooFar) {
-        checkoutBtn.disabled = true;
-        checkoutBtn.style.background = "#95a5a6"; // لون رمادي للتعطيل
-        checkoutBtn.style.cursor = "not-allowed";
-        checkoutBtn.innerText = currentLanguage === 'ar' ? "الموقع بعيد جداً للطلب المباشر" : "Location too far for direct order";
-    } else {
-        checkoutBtn.disabled = false;
-        checkoutBtn.style.background = ""; // سيعود للون الأصلي من CSS
-        checkoutBtn.innerText = currentLanguage === 'ar' ? "إتمام الطلب" : "Proceed to Checkout";
-    }
-
-    
-    const currency = currentLanguage === 'ar' ? 'ر.س' : 'SAR';
-    const removeText = currentLanguage === 'ar' ? 'حذف' : 'Remove';
-    
-    let subtotal = 0;
-    cartItems.innerHTML = items.map(item => {
-        const itemTotal = item.price * item.qty;
-        subtotal += itemTotal;
-        
-        return `
-            <div class="cart-item">
-                <div class="cart-item-img">
-                    <img src="${item.img}" alt="${item.name}">
-                </div>
-                <div class="cart-item-details">
-                    <h4>${item.name}</h4>
-                    <div class="cart-item-price">${item.price} ${currency} × ${item.qty}</div>
-                </div>
-                <div class="cart-item-controls">
-                    <div class="cart-qty-selector">
-                        <button onclick="updateCartQty(${item.id}, -1)">-</button>
-                        <span>${item.qty}</span>
-                        <button onclick="updateCartQty(${item.id}, 1)">+</button>
-                    </div>
-                    <button class="remove-btn" onclick="removeFromCart(${item.id})">${removeText}</button>
-                </div>
-                <div class="cart-item-total">${itemTotal.toFixed(2)} ${currency}</div>
-            </div>
+    items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+            <span>${item.name} (x${item.qty})</span>
+            <span>${(item.price * item.qty).toFixed(2)} ${currentLanguage === 'ar' ? 'ريال' : 'SAR'}</span>
         `;
-    }).join('');
-    
-    // الحسابات الجديدة: السعر شامل الضريبة
-    const total = subtotal;
-    const amountBeforeVat = total / 1.15;
-    const vat = total - amountBeforeVat;
-    
-    document.getElementById('subtotal-amount').innerText = `${amountBeforeVat.toFixed(2)} ${currency}`;
-    document.getElementById('vat-amount').innerText = `${vat.toFixed(2)} ${currency}`;
-    document.getElementById('total-amount').innerText = `${total.toFixed(2)} ${currency}`;
-    
+        cartItems.appendChild(div);
+        total += item.price * item.qty;
+    });
+
+    cartTotal.innerText = total.toFixed(2);
     cartSummary.style.display = 'block';
     cartActions.style.display = 'block';
+
+    // --- بداية التعديل الخاص بالتحقق من الموقع ---
+    cartActions.innerHTML = ''; // مسح الأزرار القديمة لإعادة بنائها بناءً على الحالة
+
+    const checkoutBtn = document.createElement('button');
+    checkoutBtn.className = 'primary-btn';
+    
+    // التحقق من متغير المسافة (الموجود في ملف location-check.js)
+    if (typeof isUserTooFar !== 'undefined' && isUserTooFar) {
+        checkoutBtn.disabled = true;
+        checkoutBtn.style.background = "#95a5a6"; // لون رمادي يدل على التعطيل
+        checkoutBtn.style.cursor = "not-allowed";
+        checkoutBtn.style.opacity = "0.7";
+        checkoutBtn.innerText = currentLanguage === 'ar' ? "الموقع بعيد جداً للطلب المباشر" : "Location too far for direct order";
+        
+        // إظهار تنبيه بسيط تحت الزر لتوجيهه لهنقرستيشن (اختياري)
+        const tip = document.createElement('p');
+        tip.style.cssText = "font-size: 11px; color: #e74c3c; margin-top: 8px; text-align: center;";
+        tip.innerText = currentLanguage === 'ar' ? "يمكنك الطلب عبر هنقرستيشن فقط" : "You can only order via Hungerstation";
+        cartActions.appendChild(checkoutBtn);
+        cartActions.appendChild(tip);
+    } else {
+        // الحالة الطبيعية: العميل قريب
+        checkoutBtn.disabled = false;
+        checkoutBtn.innerText = currentLanguage === 'ar' ? "إتمام الطلب" : "Proceed to Checkout";
+        checkoutBtn.onclick = () => showView('checkout-view');
+        cartActions.appendChild(checkoutBtn);
+    }
+
+    // إضافة زر العودة للمنيو
+    const backBtn = document.createElement('button');
+    backBtn.className = 'text-btn';
+    backBtn.innerText = currentLanguage === 'ar' ? "العودة للمنيو" : "Back to Menu";
+    backBtn.onclick = closeModal;
+    cartActions.appendChild(backBtn);
+    // --- نهاية التعديل ---
 }
 
 function updateCartQty(id, delta) {
