@@ -93,12 +93,13 @@ function updateCartCount() {
 
     countEl.innerText = count;
     
-    // إخفاء الزر تماماً إذا كان العميل بعيداً أو السلة فارغة
-    if (count > 0 && !isUserTooFar) {
+    // الشرط المعدل: يظهر الزر فقط إذا كان هناك عناصر "و" العميل ليس بعيداً
+    if (count > 0 && (typeof isUserTooFar !== 'undefined' && !isUserTooFar)) {
         countEl.style.display = 'flex';
         fabEl.style.display = 'flex';
         fabEl.classList.add('has-items');
     } else {
+        // في حال كان العميل بعيداً أو السلة فارغة، يختفي الزر تماماً من الشاشة
         countEl.style.display = 'none';
         fabEl.style.display = 'none';
         fabEl.classList.remove('has-items');
