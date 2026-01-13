@@ -48,8 +48,23 @@ function showToast(message) {
 }
 
 function addToCart(id) {
+    // منع الإضافة إذا كان العميل بعيداً
+    if (typeof isUserTooFar !== 'undefined' && isUserTooFar) {
+        const farMsg = currentLanguage === 'ar' 
+            ? 'عذراً، أنت خارج نطاق التوصيل المباشر. يمكنك الطلب عبر هنقرستيشن.' 
+            : 'Sorry, you are outside the direct delivery range. Please order via Hungerstation.';
+        showToast(farMsg);
+        // إظهار التنبيه مرة أخرى للتذكير
+        const distance = 0; // سيتم تحديثها تلقائياً من دالة المراقبة
+        showLocationWarning(""); 
+        return;
+    }
+
     const soup = getProductById(id, currentLanguage);
-    const qty = parseInt(document.getElementById(`qty-val-${id}`).innerText);
+    const qtyVal = document.getElementById(`qty-val-${id}`);
+    if (!qtyVal) return;
+    
+    const qty = parseInt(qtyVal.innerText);
     
     if (qty <= 0) {
         const message = currentLanguage === 'ar' ? 'يرجى تحديد الكمية أولاً!' : 'Please select quantity first!';
@@ -63,7 +78,7 @@ function addToCart(id) {
         cart[id] = { ...soup, qty };
     }
     
-    document.getElementById(`qty-val-${id}`).innerText = '1';
+    qtyVal.innerText = '1';
     
     updateCartCount();
     showCartNotification();
@@ -72,13 +87,20 @@ function addToCart(id) {
 function updateCartCount() {
     const count = Object.values(cart).reduce((sum, item) => sum + item.qty, 0);
     const countEl = document.getElementById('cart-count');
-    countEl.innerText = count;
-    countEl.style.display = count > 0 ? 'flex' : 'none';
-    
     const fabEl = document.getElementById('cart-fab');
-    if (count > 0) {
+
+    if (!countEl || !fabEl) return;
+
+    countEl.innerText = count;
+    
+    // إخفاء الزر تماماً إذا كان العميل بعيداً أو السلة فارغة
+    if (count > 0 && !isUserTooFar) {
+        countEl.style.display = 'flex';
+        fabEl.style.display = 'flex';
         fabEl.classList.add('has-items');
     } else {
+        countEl.style.display = 'none';
+        fabEl.style.display = 'none';
         fabEl.classList.remove('has-items');
     }
 }
@@ -105,67 +127,82 @@ function renderCart() {
     const cartSummary = document.getElementById('cart-summary');
     const cartActions = document.getElementById('cart-actions');
     
+    // التحقق من وجود العناصر الأساسية لمنع أخطاء JavaScript
+    if (!cartItems || !cartTotal) return;
+
     cartItems.innerHTML = '';
     let total = 0;
     const items = Object.values(cart);
 
+    // حالة السلة فارغة
     if (items.length === 0) {
         cartItems.innerHTML = `<p style="text-align:center; padding:20px; color:#888;">${currentLanguage === 'ar' ? 'السلة فارغة' : 'Cart is empty'}</p>`;
-        cartSummary.style.display = 'none';
-        cartActions.style.display = 'none';
+        if (cartSummary) cartSummary.style.display = 'none';
+        if (cartActions) cartActions.style.display = 'none';
         return;
     }
 
+    // بناء قائمة المنتجات في السلة
     items.forEach(item => {
         const div = document.createElement('div');
         div.className = 'cart-item';
         div.innerHTML = `
-            <span>${item.name} (x${item.qty})</span>
+            <div class="cart-item-info">
+                <span>${item.name} (x${item.qty})</span>
+                <div class="cart-item-controls">
+                    <button onclick="updateCartQty(${item.id}, -1)">-</button>
+                    <button onclick="updateCartQty(${item.id}, 1)">+</button>
+                </div>
+            </div>
             <span>${(item.price * item.qty).toFixed(2)} ${currentLanguage === 'ar' ? 'ريال' : 'SAR'}</span>
         `;
         cartItems.appendChild(div);
         total += item.price * item.qty;
     });
 
+    // تحديث المجموع النهائي
     cartTotal.innerText = total.toFixed(2);
-    cartSummary.style.display = 'block';
-    cartActions.style.display = 'block';
+    if (cartSummary) cartSummary.style.display = 'block';
 
-    // --- بداية التعديل الخاص بالتحقق من الموقع ---
-    cartActions.innerHTML = ''; // مسح الأزرار القديمة لإعادة بنائها بناءً على الحالة
+    // التحكم في أزرار الأكشن بناءً على مسافة العميل
+    if (cartActions) {
+        cartActions.style.display = 'block';
+        cartActions.innerHTML = ''; // مسح الأزرار القديمة لإعادة بنائها
 
-    const checkoutBtn = document.createElement('button');
-    checkoutBtn.className = 'primary-btn';
-    
-    // التحقق من متغير المسافة (الموجود في ملف location-check.js)
-    if (typeof isUserTooFar !== 'undefined' && isUserTooFar) {
-        checkoutBtn.disabled = true;
-        checkoutBtn.style.background = "#95a5a6"; // لون رمادي يدل على التعطيل
-        checkoutBtn.style.cursor = "not-allowed";
-        checkoutBtn.style.opacity = "0.7";
-        checkoutBtn.innerText = currentLanguage === 'ar' ? "الموقع بعيد جداً للطلب المباشر" : "Location too far for direct order";
-        
-        // إظهار تنبيه بسيط تحت الزر لتوجيهه لهنقرستيشن (اختياري)
-        const tip = document.createElement('p');
-        tip.style.cssText = "font-size: 11px; color: #e74c3c; margin-top: 8px; text-align: center;";
-        tip.innerText = currentLanguage === 'ar' ? "يمكنك الطلب عبر هنقرستيشن فقط" : "You can only order via Hungerstation";
-        cartActions.appendChild(checkoutBtn);
-        cartActions.appendChild(tip);
-    } else {
-        // الحالة الطبيعية: العميل قريب
-        checkoutBtn.disabled = false;
-        checkoutBtn.innerText = currentLanguage === 'ar' ? "إتمام الطلب" : "Proceed to Checkout";
-        checkoutBtn.onclick = () => showView('checkout-view');
-        cartActions.appendChild(checkoutBtn);
+        const checkoutBtn = document.createElement('button');
+        checkoutBtn.className = 'primary-btn';
+
+        // التحقق مما إذا كان العميل خارج النطاق
+        if (typeof isUserTooFar !== 'undefined' && isUserTooFar) {
+            checkoutBtn.disabled = true;
+            checkoutBtn.style.background = "#95a5a6"; 
+            checkoutBtn.style.cursor = "not-allowed";
+            checkoutBtn.innerText = currentLanguage === 'ar' ? "الموقع بعيد جداً للطلب المباشر" : "Location too far";
+            
+            const hungerstationLink = document.createElement('p');
+            hungerstationLink.style.cssText = "font-size: 12px; color: #e74c3c; margin-top: 10px; text-align: center;";
+            hungerstationLink.innerHTML = currentLanguage === 'ar' 
+                ? 'يمكنك الطلب عبر <a href="https://hungerstation.com/sa-ar/restaurant/saudi/mecca/kudy/127096" target="_blank" style="color:#e74c3c; font-weight:bold;">هنقرستيشن</a>' 
+                : 'Order via <a href="https://hungerstation.com/sa-ar/restaurant/saudi/mecca/kudy/127096" target="_blank" style="color:#e74c3c; font-weight:bold;">Hungerstation</a>';
+            
+            cartActions.appendChild(checkoutBtn);
+            cartActions.appendChild(hungerstationLink);
+        } else {
+            // الحالة الطبيعية للعميل القريب
+            checkoutBtn.disabled = false;
+            checkoutBtn.innerText = currentLanguage === 'ar' ? "إتمام الطلب" : "Proceed to Checkout";
+            checkoutBtn.onclick = () => proceedToCheckout();
+            cartActions.appendChild(checkoutBtn);
+        }
+
+        // إضافة زر العودة للمنيو دائماً
+        const backBtn = document.createElement('button');
+        backBtn.className = 'text-btn';
+        backBtn.style.marginTop = "10px";
+        backBtn.innerText = currentLanguage === 'ar' ? "إغلاق السلة" : "Close Cart";
+        backBtn.onclick = closeModal;
+        cartActions.appendChild(backBtn);
     }
-
-    // إضافة زر العودة للمنيو
-    const backBtn = document.createElement('button');
-    backBtn.className = 'text-btn';
-    backBtn.innerText = currentLanguage === 'ar' ? "العودة للمنيو" : "Back to Menu";
-    backBtn.onclick = closeModal;
-    cartActions.appendChild(backBtn);
-    // --- نهاية التعديل ---
 }
 
 function updateCartQty(id, delta) {
