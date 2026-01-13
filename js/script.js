@@ -4,6 +4,7 @@ let currentLanguage = 'ar';
 // Initialize Menu
 function initializeMenu() {
     const menuContainer = document.getElementById('menu-container');
+    if (!menuContainer) return;
     menuContainer.innerHTML = ''; // مسح المحتوى القديم
     
     const menuData = getProducts(currentLanguage);
@@ -33,12 +34,14 @@ function initializeMenu() {
 
 function changeQty(id, delta) {
     const el = document.getElementById(`qty-val-${id}`);
+    if (!el) return;
     let current = parseInt(el.innerText) + delta;
     if (current >= 1) el.innerText = current;
 }
 
 function showToast(message) {
     const toast = document.getElementById('custom-toast');
+    if (!toast) return;
     toast.innerText = message;
     toast.classList.add('show');
     
@@ -54,9 +57,10 @@ function addToCart(id) {
             ? 'عذراً، أنت خارج نطاق التوصيل المباشر. يمكنك الطلب عبر هنقرستيشن.' 
             : 'Sorry, you are outside the direct delivery range. Please order via Hungerstation.';
         showToast(farMsg);
-        // إظهار التنبيه مرة أخرى للتذكير
-        const distance = 0; // سيتم تحديثها تلقائياً من دالة المراقبة
-        showLocationWarning(""); 
+        
+        if (typeof showLocationWarning === 'function') {
+            showLocationWarning(""); 
+        }
         return;
     }
 
@@ -93,13 +97,13 @@ function updateCartCount() {
 
     countEl.innerText = count;
     
-    // الشرط المعدل: يظهر الزر فقط إذا كان هناك عناصر "و" العميل ليس بعيداً
+    // يظهر الزر فقط إذا كان هناك عناصر والعميل ليس بعيداً
     if (count > 0 && (typeof isUserTooFar !== 'undefined' && !isUserTooFar)) {
         countEl.style.display = 'flex';
         fabEl.style.display = 'flex';
         fabEl.classList.add('has-items');
     } else {
-        // في حال كان العميل بعيداً أو السلة فارغة، يختفي الزر تماماً من الشاشة
+        // إخفاء الزر تماماً إذا كان العميل بعيداً أو السلة فارغة
         countEl.style.display = 'none';
         fabEl.style.display = 'none';
         fabEl.classList.remove('has-items');
@@ -108,18 +112,21 @@ function updateCartCount() {
 
 function showCartNotification() {
     const fab = document.getElementById('cart-fab');
+    if (!fab) return;
     fab.classList.add('bounce');
     setTimeout(() => fab.classList.remove('bounce'), 600);
 }
 
 function openCart() {
     renderCart();
-    document.getElementById('modal-overlay').classList.add('active');
-    document.getElementById('cart-view').style.display = 'block';
-    document.getElementById('checkout-view').style.display = 'none';
-    document.getElementById('feedback-view').style.display = 'none';
-    document.getElementById('working-hours-view').style.display = 'none';
-    document.getElementById('contact-view').style.display = 'none';
+    const modal = document.getElementById('modal-overlay');
+    if (modal) modal.classList.add('active');
+    
+    const views = ['cart-view', 'checkout-view', 'feedback-view', 'working-hours-view', 'contact-view'];
+    views.forEach(v => {
+        const el = document.getElementById(v);
+        if (el) el.style.display = (v === 'cart-view') ? 'block' : 'none';
+    });
 }
 
 function renderCart() {
@@ -132,8 +139,6 @@ function renderCart() {
 
     cartItems.innerHTML = '';
     let total = 0;
-    
-    // تحويل السلة إلى مصفوفة للتأكد من وجود عناصر
     const items = Object.values(cart);
 
     if (items.length === 0) {
@@ -143,7 +148,6 @@ function renderCart() {
         return;
     }
 
-    // إظهار العناصر إذا كانت موجودة
     items.forEach(item => {
         const div = document.createElement('div');
         div.className = 'cart-item';
@@ -163,27 +167,33 @@ function renderCart() {
 
     cartTotal.innerText = total.toFixed(2);
     if (cartSummary) cartSummary.style.display = 'block';
-    if (cartActions) cartActions.style.display = 'block';
 
-    // تحديث أزرار الأكشن بناءً على المسافة
     if (cartActions) {
+        cartActions.style.display = 'block';
         cartActions.innerHTML = ''; 
+
+        const checkoutBtn = document.createElement('button');
+        checkoutBtn.className = 'primary-btn';
+
         if (typeof isUserTooFar !== 'undefined' && isUserTooFar) {
-            // كود العميل البعيد (تعطيل الزر)
-            const warningBtn = document.createElement('button');
-            warningBtn.className = 'primary-btn';
-            warningBtn.disabled = true;
-            warningBtn.style.background = "#95a5a6";
-            warningBtn.innerText = currentLanguage === 'ar' ? "الموقع بعيد جداً" : "Too far";
-            cartActions.appendChild(warningBtn);
+            checkoutBtn.disabled = true;
+            checkoutBtn.style.background = "#95a5a6"; 
+            checkoutBtn.style.cursor = "not-allowed";
+            checkoutBtn.innerText = currentLanguage === 'ar' ? "الموقع بعيد جداً للطلب المباشر" : "Location too far";
+            cartActions.appendChild(checkoutBtn);
         } else {
-            // كود العميل القريب (تفعيل الزر)
-            const checkoutBtn = document.createElement('button');
-            checkoutBtn.className = 'primary-btn';
-            checkoutBtn.innerText = currentLanguage === 'ar' ? "إتمام الطلب" : "Checkout";
-            checkoutBtn.onclick = proceedToCheckout;
+            checkoutBtn.disabled = false;
+            checkoutBtn.innerText = currentLanguage === 'ar' ? "إتمام الطلب" : "Proceed to Checkout";
+            checkoutBtn.onclick = () => proceedToCheckout();
             cartActions.appendChild(checkoutBtn);
         }
+
+        const backBtn = document.createElement('button');
+        backBtn.className = 'text-btn';
+        backBtn.style.marginTop = "10px";
+        backBtn.innerText = currentLanguage === 'ar' ? "إغلاق السلة" : "Close Cart";
+        backBtn.onclick = closeModal;
+        cartActions.appendChild(backBtn);
     }
 }
 
@@ -198,14 +208,10 @@ function updateCartQty(id, delta) {
     }
 }
 
-function removeFromCart(id) {
-    delete cart[id];
-    updateCartCount();
-    renderCart();
-}
-
 function proceedToCheckout() {
     const items = Object.values(cart);
+    if (items.length === 0) return;
+
     let total = 0;
     const currency = currentLanguage === 'ar' ? 'ر.س' : 'SAR';
     
@@ -222,128 +228,77 @@ function proceedToCheckout() {
     const vatLabel = currentLanguage === 'ar' ? 'ضريبة القيمة المضافة (15%)' : 'VAT (15%)';
     const totalLabel = currentLanguage === 'ar' ? 'الإجمالي (شامل الضريبة)' : 'Total (incl. VAT)';
     
-    document.getElementById('checkout-summary').innerHTML = `
-        <div class="checkout-box">
-            ${summaryHTML}
-            <div class="checkout-divider"></div>
-            <div class="checkout-item"><strong>${subtotalLabel}</strong> <span>${amountBeforeVat.toFixed(2)} ${currency}</span></div>
-            <div class="checkout-item"><strong>${vatLabel}</strong> <span>${vat.toFixed(2)} ${currency}</span></div>
-            <div class="checkout-item total"><strong>${totalLabel}</strong> <span>${total.toFixed(2)} ${currency}</span></div>
-        </div>
-    `;
+    const checkoutSummary = document.getElementById('checkout-summary');
+    if (checkoutSummary) {
+        checkoutSummary.innerHTML = `
+            <div class="checkout-box">
+                ${summaryHTML}
+                <div class="checkout-divider"></div>
+                <div class="checkout-item"><strong>${subtotalLabel}</strong> <span>${amountBeforeVat.toFixed(2)} ${currency}</span></div>
+                <div class="checkout-item"><strong>${vatLabel}</strong> <span>${vat.toFixed(2)} ${currency}</span></div>
+                <div class="checkout-item total"><strong>${totalLabel}</strong> <span id="total-amount">${total.toFixed(2)}</span> ${currency}</div>
+            </div>
+        `;
+    }
     
-    document.getElementById('cart-view').style.display = 'none';
-    document.getElementById('checkout-view').style.display = 'block';
-}
-
-function backToCart() {
-    document.getElementById('checkout-view').style.display = 'none';
-    document.getElementById('cart-view').style.display = 'block';
+    const cv = document.getElementById('cart-view');
+    const chv = document.getElementById('checkout-view');
+    if (cv) cv.style.display = 'none';
+    if (chv) chv.style.display = 'block';
 }
 
 function closeModal() {
-    document.getElementById('modal-overlay').classList.remove('active');
+    const modal = document.getElementById('modal-overlay');
+    if (modal) modal.classList.remove('active');
 }
 
-// Working Hours Modal
-function toggleWorkingHours() {
-    document.getElementById('modal-overlay').classList.add('active');
-    document.getElementById('working-hours-view').style.display = 'block';
-    document.getElementById('contact-view').style.display = 'none';
-    document.getElementById('cart-view').style.display = 'none';
-    document.getElementById('checkout-view').style.display = 'none';
-    document.getElementById('feedback-view').style.display = 'none';
-}
-
-// Contact Modal
-function openContact() {
-    document.getElementById('modal-overlay').classList.add('active');
-    document.getElementById('contact-view').style.display = 'block';
-    document.getElementById('working-hours-view').style.display = 'none';
-    document.getElementById('cart-view').style.display = 'none';
-    document.getElementById('checkout-view').style.display = 'none';
-    document.getElementById('feedback-view').style.display = 'none';
-}
-
-// Language Toggle
-function toggleLanguage() {
-    const newLang = currentLanguage === 'ar' ? 'en' : 'ar';
-    currentLanguage = newLang;
-    
-    document.documentElement.lang = newLang;
-    document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr';
-    
-    // Save preference
-    localStorage.setItem('language', newLang);
-    
-    // Apply translations
-    applyTranslations(newLang);
-    
-    // Update menu with new language
-    initializeMenu();
-    
-    // Update cart if open
-    if (document.getElementById('cart-view').style.display === 'block') {
-        renderCart();
-    }
-    
-    // Show notification
-    showToast(newLang === 'ar' ? 'تم التبديل إلى العربية' : 'Switched to English');
-}
-
-// Load saved language on page load
 window.addEventListener('DOMContentLoaded', () => {
     const savedLang = localStorage.getItem('language') || 'ar';
     currentLanguage = savedLang;
     
-    if (savedLang === 'en') {
-        document.documentElement.lang = 'en';
-        document.documentElement.dir = 'ltr';
-        applyTranslations('en');
+    document.documentElement.lang = savedLang;
+    document.documentElement.dir = savedLang === 'ar' ? 'rtl' : 'ltr';
+    
+    if (typeof applyTranslations === 'function') {
+        applyTranslations(savedLang);
     }
     
-    // Initialize menu after language is set
     initializeMenu();
 });
 
 async function processOrder() {
-    const name = document.getElementById('cust-name').value.trim();
-    const phone = document.getElementById('cust-phone').value.trim();
-    
-    const fillFieldsMsg = currentLanguage === 'ar' ? 'الرجاء إدخال جميع البيانات المطلوبة' : 'Please fill in all required fields';
-    const invalidPhoneMsg = currentLanguage === 'ar' ? 'يرجى التاكد من صحه رقم الهاتف' : 'Please check phone number validity';
-    const sendingMsg = currentLanguage === 'ar' ? 'جاري إرسال الطلب...' : 'Sending order...';
-    const confirmMsg = currentLanguage === 'ar' ? 'تأكيد وإرسال الطلب' : 'Confirm and Send Order';
-    const errorMsg = currentLanguage === 'ar' ? 'حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.' : 'An error occurred while sending the order, please try again.';
+    const nameInput = document.getElementById('cust-name');
+    const phoneInput = document.getElementById('cust-phone');
+    if (!nameInput || !phoneInput) return;
+
+    const name = nameInput.value.trim();
+    const phone = phoneInput.value.trim();
     
     if (!name || !phone) {
-        showToast(fillFieldsMsg); 
+        showToast(currentLanguage === 'ar' ? 'الرجاء إدخال جميع البيانات المطلوبة' : 'Please fill in all required fields'); 
         return;
     }
 
     const phoneRegex = /^05\d{8}$/;
     if (!phoneRegex.test(phone)) {
-        showToast(invalidPhoneMsg);
+        showToast(currentLanguage === 'ar' ? 'يرجى التاكد من صحه رقم الهاتف' : 'Please check phone number validity');
         return;
     }
 
     const orderItems = Object.values(cart).map(item => `${item.name} (${item.qty})`).join('\n');
-    const totalAmount = document.getElementById('total-amount').innerText;
+    const totalEl = document.getElementById('total-amount');
+    const totalAmount = totalEl ? totalEl.innerText : "0";
 
-    const orderData = {
-        name: name,
-        phone: phone,
-        order: orderItems,
-        total: totalAmount
-    };
+    const orderData = { name, phone, order: orderItems, total: totalAmount };
 
     const btn = document.querySelector('#checkout-view .primary-btn');
-    btn.innerText = sendingMsg;
-    btn.disabled = true;
+    if (btn) {
+        btn.innerText = currentLanguage === 'ar' ? 'جاري إرسال الطلب...' : 'Sending order...';
+        btn.disabled = true;
+    }
 
     try {
         const scriptURL = 'https://script.google.com/macros/s/AKfycbyrKS3yMc-huZs-FRdSs23pIwwC3FhId9WbV8xnV8MYq6FSZvezNmMEu9Iu3H7dOP2fAA/exec';
-        
         await fetch(scriptURL, {
             method: 'POST',
             mode: 'no-cors',
@@ -352,24 +307,25 @@ async function processOrder() {
             body: JSON.stringify(orderData)
         });
 
-        const successTitle = currentLanguage === 'ar' ? 'تم تقديم الطلب بنجاح! ✅' : 'Order placed successfully! ✅';
-        const successMsg = currentLanguage === 'ar' ? `شكراً لك ${name}، طلبك قيد التحضير 🍲` : `Thank you ${name}, your order is being prepared 🍲`;
-
         document.getElementById('checkout-view').style.display = 'none';
-        document.getElementById('feedback-view').style.display = 'block';
-        document.getElementById('feedback-view').className = "feedback-view success";
-        document.getElementById('status-title').innerText = successTitle;
-        document.getElementById('status-msg').innerText = successMsg;
+        const fv = document.getElementById('feedback-view');
+        if (fv) {
+            fv.style.display = 'block';
+            fv.className = "feedback-view success";
+            document.getElementById('status-title').innerText = currentLanguage === 'ar' ? 'تم تقديم الطلب بنجاح! ✅' : 'Order placed successfully! ✅';
+            document.getElementById('status-msg').innerText = currentLanguage === 'ar' ? `شكراً لك ${name}، طلبك قيد التحضير 🍲` : `Thank you ${name}, your order is being prepared 🍲`;
+        }
         
         cart = {};
         updateCartCount();
-        document.getElementById('cust-name').value = '';
-        document.getElementById('cust-phone').value = '';
+        nameInput.value = '';
+        phoneInput.value = '';
 
     } catch (error) {
-        console.error('Error!', error.message);
-        showToast(errorMsg);
-        btn.innerText = confirmMsg;
-        btn.disabled = false;
+        showToast(currentLanguage === 'ar' ? 'حدث خطأ، يرجى المحاولة مرة أخرى.' : 'An error occurred, please try again.');
+        if (btn) {
+            btn.innerText = currentLanguage === 'ar' ? 'تأكيد وإرسال الطلب' : 'Confirm and Send Order';
+            btn.disabled = false;
+        }
     }
 }
