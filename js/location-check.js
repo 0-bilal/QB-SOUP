@@ -1,7 +1,7 @@
 // إحداثيات الكعكية - مكة المكرمة
-const RESTAURANT_LAT = 21.389659317435278; 
-const RESTAURANT_LNG = 39.77928169205786;
-const MAX_ALLOWED_DISTANCE = 1000; // المسافة المسموح بها بالكيلومترات
+const RESTAURANT_LAT = 21.389258; 
+const RESTAURANT_LNG = 39.778964;
+const MAX_ALLOWED_DISTANCE = 100; // المسافة المسموح بها بالكيلومترات
 let isUserTooFar = false; // متغير عالمي للتحقق من الحالة
 
 // دالة مراقبة الموقع الجغرافي باستمرار
@@ -119,3 +119,4 @@ function showLocationWarning(dist) {
 // تشغيل المراقبة فور تحميل الصفحة
 
 window.addEventListener('load', startLocationWatch);
+
