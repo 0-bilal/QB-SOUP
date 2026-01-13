@@ -128,14 +128,14 @@ function renderCart() {
     const cartSummary = document.getElementById('cart-summary');
     const cartActions = document.getElementById('cart-actions');
     
-    // التحقق من وجود العناصر الأساسية لمنع أخطاء JavaScript
     if (!cartItems || !cartTotal) return;
 
     cartItems.innerHTML = '';
     let total = 0;
+    
+    // تحويل السلة إلى مصفوفة للتأكد من وجود عناصر
     const items = Object.values(cart);
 
-    // حالة السلة فارغة
     if (items.length === 0) {
         cartItems.innerHTML = `<p style="text-align:center; padding:20px; color:#888;">${currentLanguage === 'ar' ? 'السلة فارغة' : 'Cart is empty'}</p>`;
         if (cartSummary) cartSummary.style.display = 'none';
@@ -143,7 +143,7 @@ function renderCart() {
         return;
     }
 
-    // بناء قائمة المنتجات في السلة
+    // إظهار العناصر إذا كانت موجودة
     items.forEach(item => {
         const div = document.createElement('div');
         div.className = 'cart-item';
@@ -161,48 +161,29 @@ function renderCart() {
         total += item.price * item.qty;
     });
 
-    // تحديث المجموع النهائي
     cartTotal.innerText = total.toFixed(2);
     if (cartSummary) cartSummary.style.display = 'block';
+    if (cartActions) cartActions.style.display = 'block';
 
-    // التحكم في أزرار الأكشن بناءً على مسافة العميل
+    // تحديث أزرار الأكشن بناءً على المسافة
     if (cartActions) {
-        cartActions.style.display = 'block';
-        cartActions.innerHTML = ''; // مسح الأزرار القديمة لإعادة بنائها
-
-        const checkoutBtn = document.createElement('button');
-        checkoutBtn.className = 'primary-btn';
-
-        // التحقق مما إذا كان العميل خارج النطاق
+        cartActions.innerHTML = ''; 
         if (typeof isUserTooFar !== 'undefined' && isUserTooFar) {
-            checkoutBtn.disabled = true;
-            checkoutBtn.style.background = "#95a5a6"; 
-            checkoutBtn.style.cursor = "not-allowed";
-            checkoutBtn.innerText = currentLanguage === 'ar' ? "الموقع بعيد جداً للطلب المباشر" : "Location too far";
-            
-            const hungerstationLink = document.createElement('p');
-            hungerstationLink.style.cssText = "font-size: 12px; color: #e74c3c; margin-top: 10px; text-align: center;";
-            hungerstationLink.innerHTML = currentLanguage === 'ar' 
-                ? 'يمكنك الطلب عبر <a href="https://hungerstation.com/sa-ar/restaurant/saudi/mecca/kudy/127096" target="_blank" style="color:#e74c3c; font-weight:bold;">هنقرستيشن</a>' 
-                : 'Order via <a href="https://hungerstation.com/sa-ar/restaurant/saudi/mecca/kudy/127096" target="_blank" style="color:#e74c3c; font-weight:bold;">Hungerstation</a>';
-            
-            cartActions.appendChild(checkoutBtn);
-            cartActions.appendChild(hungerstationLink);
+            // كود العميل البعيد (تعطيل الزر)
+            const warningBtn = document.createElement('button');
+            warningBtn.className = 'primary-btn';
+            warningBtn.disabled = true;
+            warningBtn.style.background = "#95a5a6";
+            warningBtn.innerText = currentLanguage === 'ar' ? "الموقع بعيد جداً" : "Too far";
+            cartActions.appendChild(warningBtn);
         } else {
-            // الحالة الطبيعية للعميل القريب
-            checkoutBtn.disabled = false;
-            checkoutBtn.innerText = currentLanguage === 'ar' ? "إتمام الطلب" : "Proceed to Checkout";
-            checkoutBtn.onclick = () => proceedToCheckout();
+            // كود العميل القريب (تفعيل الزر)
+            const checkoutBtn = document.createElement('button');
+            checkoutBtn.className = 'primary-btn';
+            checkoutBtn.innerText = currentLanguage === 'ar' ? "إتمام الطلب" : "Checkout";
+            checkoutBtn.onclick = proceedToCheckout;
             cartActions.appendChild(checkoutBtn);
         }
-
-        // إضافة زر العودة للمنيو دائماً
-        const backBtn = document.createElement('button');
-        backBtn.className = 'text-btn';
-        backBtn.style.marginTop = "10px";
-        backBtn.innerText = currentLanguage === 'ar' ? "إغلاق السلة" : "Close Cart";
-        backBtn.onclick = closeModal;
-        cartActions.appendChild(backBtn);
     }
 }
 
